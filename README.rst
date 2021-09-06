@@ -4,6 +4,8 @@
 docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -v /home/queprocno/Desktop/post_data:/var/lib/postgresql/data -p 5432:5432 -d postgres
 ```
 
+cd ~/Desktop/project1_be && rsync -avIL -e "ssh -i ~/.ssh/qacer" --exclude-from=".gitignore" ./* qacer@192.168.1.23:Desktop/project1_be/
+
 ```bash
 sudo apt install python3.8-venv
 sudo apt install python3-pip
@@ -40,8 +42,13 @@ poetry config --list
 
 ## FastAPI BE
 ```bash
+#postgres driver
+sudo apt install postgresql-client-12 python3-distutils alembic
+# poetry
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+
 export POSTGRES_DB=rwdb POSTGRES_PORT=5432 POSTGRES_USER=postgres POSTGRES_PASSWORD=postgres
-docker run --name pgdb -v /home/queprocno/Desktop/post_data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER="$POSTGRES_USER" -e POSTGRES_PASSWORD="$POSTGRES_PASSWORD" -e POSTGRES_DB="$POSTGRES_DB" -d postgres
+docker run --name pgdb -v ~/Desktop/post_data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER="$POSTGRES_USER" -e POSTGRES_PASSWORD="$POSTGRES_PASSWORD" -e POSTGRES_DB="$POSTGRES_DB" -d postgres
 export POSTGRES_HOST=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pgdb)
 createdb --host=$POSTGRES_HOST --port=$POSTGRES_PORT --username=$POSTGRES_USER $POSTGRES_DB
 

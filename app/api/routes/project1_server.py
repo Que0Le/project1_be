@@ -55,26 +55,26 @@ async def project1_get_next(
     words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
 ) -> WordOutWithIdDate:
     # dictword = await words_repo.get_1_random_dictword()
-    dictword = await words_repo.get_newest_edited_dictword()
+    dictword = await words_repo.get_1_random_dictword()
     if dictword.type==strings.TYPE_STATIC_FILE:
         path = strings.PATH_STATIC_FOLDER + dictword.fullword
         return StreamingResponse(iterfile(path), media_type="image/jpeg")
     else:
         return StreamingResponse(
-            io.BytesIO(create_bitmap_from_word(dictword, output="buffer")), 
+            io.BytesIO(create_bitmap_from_word(dictword, output="__buffer")), 
             media_type="image/jpeg"
         )
 
-@router.get(
-    "/next_bitmap_from_file",
-    name="project1_server:get-next-bitmap-from-file",
-)
-def project1_get_next_from_file(
-) -> WordOutWithIdDate:
-    return StreamingResponse(
-        iterfile(strings.PATH_STATIC_FOLDER + "ausserhalb_1bit.bmp"), 
-        media_type="image/jpeg"
-    )
+# @router.get(
+#     "/next_bitmap_from_file",
+#     name="project1_server:get-next-bitmap-from-file",
+# )
+# def project1_get_next_from_file(
+# ) -> WordOutWithIdDate:
+#     return StreamingResponse(
+#         iterfile(strings.PATH_STATIC_FOLDER + "ausserhalb_1bit.bmp"), 
+#         media_type="image/jpeg"
+#     )
 
 
 
