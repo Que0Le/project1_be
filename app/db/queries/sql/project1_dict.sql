@@ -36,6 +36,9 @@ SELECT id,
 FROM project1_dicts
 WHERE id = :id;
 
+-- name: p1-get-newest-edited-dictword^
+select * from project1_dicts ORDER BY updated_at desc limit 1;
+
 -- name: p1-create-new-dictword<!
 INSERT INTO project1_dicts (word, type, fullword, content)
 VALUES (:word, :type, :fullword, :content)

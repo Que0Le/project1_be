@@ -23,3 +23,10 @@ ARTICLE_IS_NOT_FAVORITED = "article is not favorited"
 COMMENT_DOES_NOT_EXIST = "comment does not exist"
 
 AUTHENTICATION_REQUIRED = "authentication required"
+
+
+
+PATH_STATIC_FOLDER = "./static/"
+PATH_FONTS_FOLDER = "./app/resources/fonts/"
+""" Types """
+TYPE_STATIC_FILE = "__TYPE_STATIC_FILE"

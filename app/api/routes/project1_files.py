@@ -1,5 +1,7 @@
 from typing import Optional
+from typing import List
 
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi import APIRouter, Body, Depends
 from starlette import status
 
@@ -16,9 +18,6 @@ from app.models.domain.words import Word
 #     CommentInResponse,
 #     ListOfCommentsInResponse,
 # )
-from app.services.image_helpers import create_bitmap_from_word
-from fastapi.responses import StreamingResponse
-
 from app.models.schemas.words import (
     WordInUpdate,
     WordShort,
@@ -27,59 +26,9 @@ from app.models.schemas.words import (
     WordOutWithIdDate,
     WordShortOutUpdate
 )
-from app.resources import strings 
-import io
+from app.services.image_helpers import process_bitmap_from_file
 
 router = APIRouter()
-
-def iterfile(path: str):  
-    with open(path, mode="rb") as file_like:  
-        yield from file_like  
-
-@router.get(
-    "/next",
-    response_model=WordOutWithIdDate,
-    name="project1_server:get-next-word",
-)
-async def project1_get_next(
-    words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
-) -> WordOutWithIdDate:
-    dictword = await words_repo.get_1_random_dictword()
-    return dictword
-
-@router.get(
-    "/next_bitmap",
-    name="project1_server:get-next-bitmap",
-)
-async def project1_get_next(
-    words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
-) -> WordOutWithIdDate:
-    # dictword = await words_repo.get_1_random_dictword()
-    dictword = await words_repo.get_newest_edited_dictword()
-    if dictword.type==strings.TYPE_STATIC_FILE:
-        path = strings.PATH_STATIC_FOLDER + dictword.fullword
-        return StreamingResponse(iterfile(path), media_type="image/jpeg")
-    else:
-        return StreamingResponse(
-            io.BytesIO(create_bitmap_from_word(dictword, output="buffer")), 
-            media_type="image/jpeg"
-        )
-
-@router.get(
-    "/next_bitmap_from_file",
-    name="project1_server:get-next-bitmap-from-file",
-)
-def project1_get_next_from_file(
-) -> WordOutWithIdDate:
-    return StreamingResponse(
-        iterfile(strings.PATH_STATIC_FOLDER + "ausserhalb_1bit.bmp"), 
-        media_type="image/jpeg"
-    )
-
-
-
-
-
 
 # @router.get(
 #     "/",
@@ -107,24 +56,29 @@ def project1_get_next_from_file(
 #     dictword = await words_repo.get_dictword_by_id(id=word_id)
 #     return dictword
 
-# @router.post(
-#     "/",
-#     status_code=status.HTTP_201_CREATED,
-#     response_model=WordShortOutCreate,
-#     name="project1_words:create-new-dictword",
-# )
-# async def create_new_word(
-#     word_create: Word,
-#     words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
-#     # user: User = Depends(get_current_user_authorizer()),
-# ) -> WordShortOutCreate:
-#     word_row_created = await words_repo.create_new_dictword(
-#         word=word_create.word,
-#         type=word_create.type,
-#         fullword=word_create.fullword,
-#         content=word_create.content,
-#     )
-#     return word_row_created
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=WordShortOutCreate,
+    name="project1_files:create-new-file",
+)
+async def create_new_file(
+    words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
+    file: UploadFile = File(...),
+    word: str = Form(...),
+    type: str = Form(...),
+    fullword: str = Form(...),
+    content: str = Form(...),
+) -> WordShortOutCreate:
+    contents = await file.read()
+    process_bitmap_from_file(file=contents, output=fullword + ".bmp")
+    word_row_created = await words_repo.create_new_dictword(
+        word=word,
+        type=type,
+        fullword=fullword + ".bmp",
+        content=content,
+    )
+    return word_row_created
 
 # @router.put(
 #     "/{word_id}",

@@ -57,6 +57,17 @@ class Project1WordsRepository(BaseRepository):
             "Word with id={0} does not exist".format(id),
         )
 
+    async def get_newest_edited_dictword(self) -> WordOutWithIdDate:
+        word_row = await queries.p1_get_newest_edited_dictword(
+            self.connection,
+        )
+        if word_row:
+            return WordOutWithIdDate(**word_row)
+
+        raise EntityDoesNotExist(
+            "Word with id={0} does not exist".format(id),
+        )
+
     async def get_1_random_dictword(self) -> WordOutWithIdDate:
         word_row = await queries.p1_get_1_random_dictword(
             self.connection,

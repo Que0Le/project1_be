@@ -1,6 +1,38 @@
 from PIL import Image, ImageDraw, ImageFont
 import io
 
+file = "../static/change_original.png"
+threshold = 110
+
+# convert image to a list of pixels
+img = Image.open(file)
+pixels = list(img.getdata())
+
+# convert data list to contain only black or white
+newPixels = []
+for pixel in pixels:
+    # if looks like black, convert to black
+    if pixel[0] <= threshold:
+        newPixel = (0, 0, 0)
+    # if looks like white, convert to white
+    else:
+        newPixel = (255, 255, 255)
+    newPixels.append(newPixel)
+
+# create a image and put data into it
+newImg = Image.new(img.mode, img.size)
+newImg.putdata(newPixels)
+# newImg.save('new-letter.jpg')
+newImg.show()
+# with open("../static/change_original.png", 'rb') as file:
+#     out = Image.open(file)
+#     o2 = out.resize((800, 480)).convert('1')
+#     # o2.save('../static/tu.bmp')
+#     o2.show()
+#     # out.save('../static/tu.bmp')
+#     # out.show()
+exit()
+
 id="id"
 word="word"
 type="type"
