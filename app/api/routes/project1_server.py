@@ -1,29 +1,19 @@
+from app import main
 from typing import Optional
 
 from fastapi import APIRouter, Body, Depends
 from starlette import status
 
 from app.api.dependencies.database import get_repository
-# from app.db.repositories.comments import CommentsRepository
-# from app.db.repositories.words import WordsRepository
 from app.db.repositories.project1_words import Project1WordsRepository
-# from app.models.domain.articles import Article
-# from app.models.domain.comments import Comment
-# from app.models.domain.users import User
 from app.models.domain.words import Word
-# from app.models.schemas.comments import (
-#     CommentInCreate,
-#     CommentInResponse,
-#     ListOfCommentsInResponse,
-# )
 from app.services.image_helpers import create_bitmap_from_word
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse 
+
+from app.core.config import settings
+import datetime as dt
 
 from app.models.schemas.words import (
-    WordInUpdate,
-    WordShort,
-    WordShortOutCreate,
-    ListOfWordOutWithIdDate,
     WordOutWithIdDate,
     WordShortOutUpdate
 )
@@ -44,6 +34,8 @@ def iterfile(path: str):
 async def project1_get_next(
     words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
 ) -> WordOutWithIdDate:
+
+
     dictword = await words_repo.get_1_random_dictword()
     return dictword
 

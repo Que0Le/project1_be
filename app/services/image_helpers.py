@@ -54,3 +54,6 @@ def process_bitmap_from_file(file: File, output="temp.bmp"):
         return img_byte_arr
     else:
         o2.save(strings.PATH_STATIC_FOLDER + output, format='bmp')
+
+def create_bitmap_from_calendar():
+    pass

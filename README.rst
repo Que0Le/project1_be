@@ -1,3 +1,4 @@
+May need `poetry add tzlocal==2.1` for O365
 
 ```bash
 ###

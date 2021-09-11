@@ -11,6 +11,9 @@ from app.core.events import create_start_app_handler, create_stop_app_handler
 
 """ Static files """
 from fastapi.staticfiles import StaticFiles
+# periodic task
+from fastapi_utils.tasks import repeat_every
+from app.core.config import settings
 
 def get_application() -> FastAPI:
     application = FastAPI(title=PROJECT_NAME, debug=DEBUG, version=VERSION)
@@ -36,3 +39,10 @@ def get_application() -> FastAPI:
 
 
 app = get_application()
+
+@app.on_event("startup")
+@repeat_every(seconds=30*60, wait_first=True)
+def refresh_token():
+    if settings.account:
+        settings.account.connection.refresh_token()
+        print("refreshing token: " + str(settings.account.get_current_user))

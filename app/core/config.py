@@ -42,3 +42,16 @@ for logger_name in LOGGERS:
     logging_logger.handlers = [InterceptHandler(level=LOGGING_LEVEL)]
 
 logger.configure(handlers=[{"sink": sys.stderr, "level": LOGGING_LEVEL}])
+
+
+""" Settings """
+from pydantic import BaseSettings
+from O365 import Account, account
+
+class Settings(BaseSettings):
+    app_name: str = "Awesome API"
+    admin_email: str = "Admin@admin.admin"
+    items_per_user: int = 50
+    account: Account = None
+
+settings = Settings()
