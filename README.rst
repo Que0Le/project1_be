@@ -1,5 +1,6 @@
 May need `poetry add tzlocal==2.1` for O365
-
+project1.ac1@outlook.com
+JKndfu203Pfslkm23-k2(.Fun
 ```bash
 ###
 docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -v /home/queprocno/Desktop/post_data:/var/lib/postgresql/data -p 5432:5432 -d postgres

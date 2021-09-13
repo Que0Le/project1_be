@@ -42,6 +42,7 @@ pytest-env = "^0.6.2"
 docker = "^5.0"
 httpx = "^0.18.2"
 asgi-lifespan = "^1.0.1"
+autopep8 = "^1.5.7"
 
 [tool.isort]
 profile = "black"

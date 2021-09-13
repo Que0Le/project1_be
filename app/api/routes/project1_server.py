@@ -7,7 +7,13 @@ from starlette import status
 from app.api.dependencies.database import get_repository
 from app.db.repositories.project1_words import Project1WordsRepository
 from app.models.domain.words import Word
-from app.services.image_helpers import create_bitmap_from_word
+from app.services.image_helpers import (
+    create_bitmap_from_word,
+    create_bitmap_from_calendar
+)
+from app.services.calendar_helpers import (
+    get_calendar_for_this_week
+)
 from fastapi.responses import StreamingResponse 
 
 from app.core.config import settings
@@ -19,6 +25,7 @@ from app.models.schemas.words import (
 )
 from app.resources import strings 
 import io
+import datetime as dt
 
 router = APIRouter()
 
@@ -34,10 +41,15 @@ def iterfile(path: str):
 async def project1_get_next(
     words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
 ) -> WordOutWithIdDate:
-
-
-    dictword = await words_repo.get_1_random_dictword()
-    return dictword
+    if settings.o365_account:
+        all_events = get_calendar_for_this_week(settings.o365_account.schedule())
+        return StreamingResponse(
+            io.BytesIO(create_bitmap_from_calendar(all_events, output="__buffer")), 
+            media_type="image/jpeg"
+        )
+    else:
+        dictword = await words_repo.get_1_random_dictword()
+        return dictword
 
 @router.get(
     "/next_bitmap",
@@ -45,17 +57,24 @@ async def project1_get_next(
 )
 async def project1_get_next(
     words_repo: Project1WordsRepository = Depends(get_repository(Project1WordsRepository)),
-) -> WordOutWithIdDate:
-    # dictword = await words_repo.get_1_random_dictword()
-    dictword = await words_repo.get_1_random_dictword()
-    if dictword.type==strings.TYPE_STATIC_FILE:
-        path = strings.PATH_STATIC_FOLDER + dictword.fullword
-        return StreamingResponse(iterfile(path), media_type="image/jpeg")
-    else:
+) -> io.BytesIO:
+    #TODO: next_engine will decide which content will be served at this moment
+    if (dt.datetime.now().minute % 2 == 0) and settings.o365_account:
+        all_events = get_calendar_for_this_week(settings.o365_account.schedule())
         return StreamingResponse(
-            io.BytesIO(create_bitmap_from_word(dictword, output="__buffer")), 
+            io.BytesIO(create_bitmap_from_calendar(all_events, output="__buffer")), 
             media_type="image/jpeg"
         )
+    else:
+        dictword = await words_repo.get_1_random_dictword()
+        if dictword.type==strings.TYPE_STATIC_FILE:
+            path = strings.PATH_STATIC_FOLDER + dictword.fullword
+            return StreamingResponse(iterfile(path), media_type="image/jpeg")
+        else:
+            return StreamingResponse(
+                io.BytesIO(create_bitmap_from_word(dictword, output="__buffer")), 
+                media_type="image/jpeg"
+            )
 
 # @router.get(
 #     "/next_bitmap_from_file",

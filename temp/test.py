@@ -1,79 +1,127 @@
-
+import datetime as dt
+from O365 import Account, MSGraphProtocol
+import pytz
+import os
 from PIL import Image, ImageDraw, ImageFont
 import io
+import textwrap
+# from app.resources import strings
 
-file = "../static/change_original.png"
-threshold = 110
+CLIENT_ID = '3a9eef7d-ab34-45f1-a9fd-3780564d7a2e'
+SECRET_ID = '<your secret id>'
+SECRET_VALUE = 'kpiQvG6_4ovz05n4c7Sn8.KOZE0rT.21s_'
 
-# convert image to a list of pixels
-img = Image.open(file)
-pixels = list(img.getdata())
+credentials = (CLIENT_ID, SECRET_VALUE)
 
-# convert data list to contain only black or white
-newPixels = []
-for pixel in pixels:
-    # if looks like black, convert to black
-    if pixel[0] <= threshold:
-        newPixel = (0, 0, 0)
-    # if looks like white, convert to white
-    else:
-        newPixel = (255, 255, 255)
-    newPixels.append(newPixel)
+daysOftheWeek = ("ISO Week days start from 1",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+                )
 
-# create a image and put data into it
-newImg = Image.new(img.mode, img.size)
-newImg.putdata(newPixels)
-# newImg.save('new-letter.jpg')
-newImg.show()
-# with open("../static/change_original.png", 'rb') as file:
-#     out = Image.open(file)
-#     o2 = out.resize((800, 480)).convert('1')
-#     # o2.save('../static/tu.bmp')
-#     o2.show()
-#     # out.save('../static/tu.bmp')
-#     # out.show()
-exit()
+subjects = [
+   "Rechner organisation",
+   "Einführung in die Programmierung",
+   "Informatik Propädeutikum",
+   "Analysis I und Lineare",
+   "Diskrete Strukturen",
+   "Stochastik",
+]
+locations = [
+   "H101",
+   "MA01",
+   "FT100",
+   "A101",
+   "C101",
+   "H105",
+]
+os.environ['TZ'] = 'Europe/Berlin'
+starts = [
+   dt.datetime(2021, 10, 4, 8, 00, 0, 0),
+   dt.datetime(2021, 10, 4, 10, 00, 0, 0),
+   dt.datetime(2021, 10, 5, 12, 00, 0, 0),
+   dt.datetime(2021, 10, 6, 14, 00, 0, 0),
+   dt.datetime(2021, 10, 7, 10, 00, 0, 0),
+   dt.datetime(2021, 10, 8, 16, 00, 0, 0),
+]
 
-id="id"
-word="word"
-type="type"
-fullword="fullword"
-content="content-skafnbka-sfkn3=fmwoeif\niwhrffhwesefowofw-ffwo\nefnskefnsfknufhu2fhesiofne"
-created_at="created_at"
-updated_at="updated_at"
+scopes = [
+   'https://graph.microsoft.com/Mail.ReadWrite', 
+   'https://graph.microsoft.com/Mail.Send',
+   'https://graph.microsoft.com/Calendars.ReadWrite'
+]
 
-# create an image
+
 out = Image.new("1", (800, 480), 255)
-img_byte_arr = io.BytesIO()
-# get a font
-fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 40)
-fnt60 = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 60)
-fnt30 = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 30)
-fnt20 = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 30)
+fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 25)
+fnt20 = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 20)
+fnt10 = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 15)
+
 # get a drawing context
 d = ImageDraw.Draw(out)
+# Draw 
+# d.line((0, 0, 800, 0), fill=0, width=5)
 
-
-d.text((5,5), word, font=fnt60, fill=0)
-d.text((5,60), type, font=fnt30, fill=0)
-d.line((0, 100, 800, 100), fill=0)
-# ---------------------------------------------
-d.text((5,120), fullword, font=fnt30, fill=0)
-d.multiline_text((5,160), content, font=fnt20, fill=0)
-d.line((0, 430, 800, 430), fill=0)
-# ---------------------------------------------
-d.text((5,440), updated_at, font=fnt30, fill=0)
-
-# draw multiline text
-# d.multiline_text((20,20), "Hello\nWorld", font=fnt, fill=0)
-# d.line((0, 0) + (800, 480), fill=0)
-# d.line((0, 480, 800, 0), fill=0)
-
-out.save(img_byte_arr, format='bmp')
-img_byte_arr = img_byte_arr.getvalue()
-print(img_byte_arr)
-# out.save('static/pil_text.bmp')
+d1=130 #hard code distance
+y1=5   # y position
+x1 = 110
+d.text((x1+0*d1,y1), "Mon", font=fnt, fill=0)
+d.text((x1+1*d1,y1), "Tue", font=fnt, fill=0)
+d.text((x1+2*d1,y1), "Wed", font=fnt, fill=0)
+d.text((x1+3*d1,y1), "Thurs", font=fnt, fill=0)
+d.text((x1+4*d1+20,y1), "Frid", font=fnt, fill=0)
+# # ---------------------------------------------
+d.line((80, 35, 800, 35), fill=0, width=2)
+d.line((80, 35, 80, 480), fill=0, width=2)
+# # ---------------------------------------------
+d2 = 70
+x2=5
+y2 = 27
+d.text((x2, y2+0*d2), "08:00", font=fnt20, fill=0)
+d.text((x2, y2+1*d2), "10:00", font=fnt20, fill=0)
+d.text((x2, y2+2*d2), "12:00", font=fnt20, fill=0)
+d.text((x2, y2+3*d2), "14:00", font=fnt20, fill=0)
+d.text((x2, y2+4*d2), "16:00", font=fnt20, fill=0)
+d.text((x2, y2+5*d2), "18:00", font=fnt20, fill=0)
+d.text((x2, y2+6*d2), "20:00", font=fnt20, fill=0)
+# # ---------------------------------------------
+# horizontal
+d.line((80, 35+1*d2, 800, 35+1*d2), fill=0, width=1)
+d.line((80, 35+2*d2, 800, 35+2*d2), fill=0, width=1)
+d.line((80, 35+3*d2, 800, 35+3*d2), fill=0, width=1)
+d.line((80, 35+4*d2, 800, 35+4*d2), fill=0, width=1)
+d.line((80, 35+5*d2, 800, 35+5*d2), fill=0, width=1)
+d.line((80, 35+6*d2, 800, 35+6*d2), fill=0, width=1)
+# # ---------------------------------------------
+# vertical
+d.line((80+1*(d1-0), 35, 80+1*(d1-0), 480), fill=0, width=1)
+d.line((80+2*(d1-0), 35, 80+2*(d1-0), 480), fill=0, width=1)
+d.line((80+3*(d1-0), 35, 80+3*(d1-0), 480), fill=0, width=1)
+d.line((80+4*(d1-0), 35, 80+4*(d1-0), 480), fill=0, width=1)
+d.line((80+5*(d1-0), 35, 80+5*(d1-0), 480), fill=0, width=1)
+# # ---------------------------------------------
+time_range = [8, 10, 12, 14, 16, 18]
+for i in range(0, len(subjects)):
+    print(starts[i].hour)
+    y=-1
+    x=-1
+    for j in range(len(time_range)-1):
+        if starts[i].hour >= time_range[j] and starts[i].hour < time_range[j+1]:
+            y=j
+            break
+    x = starts[i].weekday()
+    if 0<=y and y<=5 and 0<=x and x<=4:
+        # Now we draw to timetable
+        # d.text((90+x*d1, 40+y*d2), subjects[i], font=fnt10, fill=0)
+        offset = 0
+        for line in textwrap.wrap(subjects[i], break_long_words=False, width=11):
+            print(line)
+            d.text((90+x*d1, 40+y*d2+offset), line, font=fnt10, fill=0)
+            offset += fnt10.getsize(line)[1]
+        d.text((90+30+x*d1, 87+y*d2), locations[i], font=fnt10, fill=0)
 
 out.show()
-
-# img.save('static/pil_text.png')
