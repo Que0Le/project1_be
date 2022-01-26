@@ -24,13 +24,13 @@ def create_start_app_handler(app: FastAPI) -> Callable:  # type: ignore
     async def start_app() -> None:
         await connect_to_db(app)
     
-    protocol = MSGraphProtocol() 
-    account = Account(credentials, protocol=protocol)
-    if account.authenticate(scopes=scopes):
-        print('Authenticated!')
-        settings.o365_account = account
-    else:
-        print("Auth O365 failed!")
+    # protocol = MSGraphProtocol() 
+    # account = Account(credentials, protocol=protocol)
+    # if account.authenticate(scopes=scopes):
+    #     print('Authenticated!')
+    #     settings.o365_account = account
+    # else:
+    #     print("Auth O365 failed!")
 
     return start_app
 

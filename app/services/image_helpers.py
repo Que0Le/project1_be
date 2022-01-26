@@ -11,7 +11,7 @@ from typing import List
 from O365 import calendar
 import textwrap
 
-""" Return byte buffer if output=='', else export file """
+""" Return byte buffer if output=='__buffer', else export file 'output' @"""
 def create_bitmap_from_word(word: WordOutWithIdDate, output="temp.bmp"):
 
     out = Image.new("1", (800, 480), 255)
@@ -34,7 +34,16 @@ def create_bitmap_from_word(word: WordOutWithIdDate, output="temp.bmp"):
     d.line((0, 100, 800, 100), fill=0)
     # ---------------------------------------------
     d.text((5, 120), word.fullword, font=fm30, fill=0)
-    d.multiline_text((5, 160), word.content, font=fmb30, fill=0)
+    # d.multiline_text((5, 160), word.content, font=fmb30, fill=0)
+    offset = 0
+    count = 0
+    for line in textwrap.wrap(str(word.content), break_long_words=False, width=43):
+        # print(line)
+        d.text((5, 160 + offset), line, font=fm30, fill=0)
+        offset += fm30.getsize(line)[1]
+        count += 1
+        if count==9:
+            break
     d.line((0, 435, 800, 435), fill=0)
     # ---------------------------------------------
     d.text((5, 445), "Last update: " +
@@ -47,6 +56,8 @@ def create_bitmap_from_word(word: WordOutWithIdDate, output="temp.bmp"):
         out.save(img_byte_arr, format='bmp')
         img_byte_arr = img_byte_arr.getvalue()
         return img_byte_arr
+    elif output == "__image_object":
+        return out
     else:
         out.save(strings.PATH_STATIC_FOLDER + output)
 
